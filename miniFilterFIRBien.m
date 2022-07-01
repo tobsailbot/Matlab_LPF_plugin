@@ -2,11 +2,10 @@ classdef miniFilterFIRBien < audioPlugin
 
     properties  
         fc = 1000;
+        orden = 3;
     end
 
-    properties
-        %Pasa bajos butter de orden 3 con fc/fN = 1000/24000
-        orden = 8; % 1 - 6 max
+    properties (Access = private)
         inicial ;
         b ; % inicializar variables
         a ;
@@ -16,15 +15,14 @@ classdef miniFilterFIRBien < audioPlugin
         PluginInterface = audioPluginInterface(...
              audioPluginParameter('fc',...
              'DisplayName','Cutoff Frequency',...
-             'Mapping',{'log',20,20e3}))
+             'Mapping',{'log',20,20e3}),...
+             audioPluginParameter('orden',...
+             'DisplayName','Orden',...
+             'Mapping',{'int',1,6}))
    end
 
     methods
         function out=process(p,in)
-            %[p.b,p.a] = deal([0.000247, 0.000741, 0.000741, 0.000247],...
-            % [1, -2.738, 2.51, -0.77]);
-            %fs = getSampleRate(p);
-            %[p.b,p.a] = butterCoeff(p.fc, fs, p.orden);
             [out, p.inicial] = filter(p.b, p.a, in, p.inicial);
         end
 
@@ -34,12 +32,18 @@ classdef miniFilterFIRBien < audioPlugin
             [p.b,p.a] = butterCoeff(p.fc, fs, p.orden);
         end
 
-       function set.fc(p,fc)
+        function set.orden(p,value) 
+            p.orden = value; % actualizar el valor de la propiedad
+            p.reset(); % reiniciar el filtro
+        end
 
-            p.fc = fc;
+        function set.fc(p,value) 
+            p.fc = value; % actualizar el valor de la propiedad
             fs = getSampleRate(p);
             [p.b,p.a] = butterCoeff(p.fc, fs, p.orden);
         end
+
+
     end
 
 end

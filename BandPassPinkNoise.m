@@ -1,5 +1,5 @@
 % Filtro butter LPF, que permite variar el cutoff y el orden del filtro
-classdef butterBandPass < audioPlugin
+classdef BandPassPinkNoise < audioPlugin
 
     properties  
         f0 = 1000;
